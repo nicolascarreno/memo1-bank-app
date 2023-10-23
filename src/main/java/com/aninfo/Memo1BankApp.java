@@ -1,6 +1,7 @@
 package com.aninfo;
 
 import com.aninfo.model.Account;
+import com.aninfo.model.Transaction.Transaction;
 import com.aninfo.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -27,6 +28,7 @@ public class Memo1BankApp {
 	@Autowired
 	private AccountService accountService;
 
+
 	public static void main(String[] args) {
 		SpringApplication.run(Memo1BankApp.class, args);
 	}
@@ -48,6 +50,18 @@ public class Memo1BankApp {
 		return ResponseEntity.of(accountOptional);
 	}
 
+	@GetMapping("/transactions/{id}")
+	public ResponseEntity<Transaction> getTransaction(@PathVariable Long id) {
+		Optional<Transaction> transactionOptional = accountService.getTransaction(id);
+		return ResponseEntity.of(transactionOptional);
+	}
+
+	@GetMapping("/accounts/{cbu}/getAccountTransactions")
+	public ResponseEntity<Collection<Transaction>> getAccountTransactions(@PathVariable Long cbu) {
+		Optional<Collection<Transaction>> transactionsOptional = accountService.getTransactionsFromAccount(cbu);
+		return ResponseEntity.of(transactionsOptional);
+	}
+
 	@PutMapping("/accounts/{cbu}")
 	public ResponseEntity<Account> updateAccount(@RequestBody Account account, @PathVariable Long cbu) {
 		Optional<Account> accountOptional = accountService.findById(cbu);
@@ -58,6 +72,10 @@ public class Memo1BankApp {
 		account.setCbu(cbu);
 		accountService.save(account);
 		return ResponseEntity.ok().build();
+	}
+
+	@DeleteMapping("/transactions/{id}")
+	public void deleteTransaction(@PathVariable Long id) { accountService.deleteTransactionById(id);
 	}
 
 	@DeleteMapping("/accounts/{cbu}")
